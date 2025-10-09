@@ -912,7 +912,8 @@ namespace Python.Runtime
                 {
                     PythonEngine.EndAllowThreads(ts);
                 }
-                Exceptions.SetError(e);
+                //Exceptions.SetError(e);
+                Exceptions.SetError(Exceptions.Exception, e.Message);
                 return default;
             }
 
