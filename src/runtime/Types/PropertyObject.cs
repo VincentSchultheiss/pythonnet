@@ -88,7 +88,8 @@ namespace Python.Runtime
                 {
                     e = e.InnerException;
                 }
-                Exceptions.SetError(e);
+                //Exceptions.SetError(e);
+                Exceptions.SetError(Exceptions.Exception, e.Message);
                 return default;
             }
         }
@@ -164,7 +165,8 @@ namespace Python.Runtime
                 {
                     e = e.InnerException;
                 }
-                Exceptions.SetError(e);
+                //Exceptions.SetError(e);
+                Exceptions.SetError(Exceptions.Exception, e.Message);
                 return -1;
             }
         }
