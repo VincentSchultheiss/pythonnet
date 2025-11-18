@@ -396,10 +396,6 @@ namespace Python.Runtime
                 {
                     continue;
                 }
-                if (isOperator && pi[0].ParameterType != mi.DeclaringType)
-                {
-                    isReverse = true;
-                }
                 // Preprocessing pi to remove either the first or second argument.
                 if (isOperator && !isReverse)
                 {
