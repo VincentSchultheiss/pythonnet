@@ -764,6 +764,20 @@ namespace Python.Runtime
             paramsArray = parameters.Length > 0 && Attribute.IsDefined(parameters[parameters.Length - 1], typeof(ParamArrayAttribute));
             kwargsMatched = 0;
             defaultsNeeded = 0;
+
+            if (!paramsArray && positionalArgumentCount + kwargDict.Count > parameters.Length)
+            {
+                return false;
+            }
+            var parametersNames = parameters.Select(x => x.Name);
+            foreach (var kwargKey in kwargDict.Keys)
+            {
+                if (!parametersNames.Contains(kwargKey))
+                {
+                    return false;
+                }
+            }
+            
             if (positionalArgumentCount == parameters.Length && kwargDict.Count == 0)
             {
                 match = true;
