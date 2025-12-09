@@ -396,6 +396,13 @@ namespace Python.Runtime
                 {
                     continue;
                 }
+                // Discard if argsReversed is false but method's parameter type is not declaring type
+                // (ideally, these methods should not have been included in ClassManager.GetClassInfo()
+                // and OperatorMethod.FilterMethods() in the first place)
+                if (isOperator && !isReverse && pi[0].ParameterType != mi.DeclaringType)
+                {
+                    continue;
+                }
                 // Preprocessing pi to remove either the first or second argument.
                 if (isOperator && !isReverse)
                 {
