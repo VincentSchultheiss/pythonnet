@@ -318,6 +318,19 @@ namespace Python.Runtime
             using (var mod = Runtime.PyString_FromString(mn))
                 Runtime.PyDict_SetItem(dict, PyIdentifier.__module__, mod.Borrow());
 
+            // build allowedAttributes
+            impl.allowedAttributes = new HashSet<string>();
+
+            NewReference dirList = Runtime.PyObject_Dir(type.Reference);
+            int len = (int)Runtime.PyList_Size(dirList.Borrow());
+
+            for (int i = 0; i < len; i++)
+            {
+                BorrowedReference item = Runtime.PyList_GetItem(dirList.Borrow(), i);
+                string? attr = Runtime.GetManagedString(item);
+                impl.allowedAttributes.Add(attr);
+            }
+
             Runtime.PyType_Modified(type.Reference);
 
             //DebugUtil.DumpType(type);

@@ -27,6 +27,7 @@ namespace Python.Runtime
         internal Indexer? indexer;
         internal readonly Dictionary<int, MethodObject> richcompare = new();
         internal MaybeType type;
+        internal HashSet<string>? allowedAttributes;
 
         internal ClassBase(Type tp)
         {
@@ -335,6 +336,43 @@ namespace Python.Runtime
             }
         }
 
+        public static int tp_setattro(BorrowedReference ob, BorrowedReference key, BorrowedReference val)
+        {
+            string? name = Runtime.GetManagedString(key);
+
+            var type = Runtime.PyObject_TYPE(ob);
+            var cls = (ClassBase)GetManagedObject(type)!;
+
+            // VS 2026-02-27: Note that checking Runtime.PyObject_HasAttr(type, key) is not sufficient,
+            //                because this somehow does not work with properties defined in inherited types.
+
+            // lazy-build allowedAttributes if not yet built
+            if (cls.allowedAttributes == null)
+            {
+                cls.allowedAttributes = new HashSet<string>();
+
+                NewReference dirList = Runtime.PyObject_Dir(type);
+                int len = (int)Runtime.PyList_Size(dirList.Borrow());
+
+                for (int i = 0; i < len; i++)
+                {
+                    BorrowedReference item = Runtime.PyList_GetItem(dirList.Borrow(), i);
+                    string? attr = Runtime.GetManagedString(item);
+                    cls.allowedAttributes.Add(attr);
+                }
+            }
+
+            //if (!name.StartsWith("_"))  // allow private/magic names
+            //{
+                if (!cls.allowedAttributes.Contains(name))
+                {
+                    Exceptions.SetError(Exceptions.AttributeError, $"object has no attribute '{name}'");
+                    return -1;
+                }
+            //}
+
+            return Runtime.PyObject_GenericSetAttr(ob, key, val);
+        }
 
         /// <summary>
         /// Standard dealloc implementation for instances of reflected types.
