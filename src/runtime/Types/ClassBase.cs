@@ -346,13 +346,25 @@ namespace Python.Runtime
             // VS 2026-02-27: Note that checking Runtime.PyObject_HasAttr(type, key) is not sufficient,
             //                because this somehow does not work with properties defined in inherited types.
 
-            // lazy-build allowedAttributes if not yet built
             if (cls.allowedAttributes == null)
             {
                 cls.allowedAttributes = new HashSet<string>();
+            }
 
-                NewReference dirList = Runtime.PyObject_Dir(type);
-                int len = (int)Runtime.PyList_Size(dirList.Borrow());
+            int lenOrig = cls.allowedAttributes.Count;
+
+            NewReference dirList = Runtime.PyObject_Dir(type);
+            int len = (int)Runtime.PyList_Size(dirList.Borrow());
+
+            if (lenOrig != len)
+            {
+                // VS 2026-03-03: This check is necessary, because allowedAttributes may
+                //                not yet contain attributes of parent class at this point.
+
+                if (lenOrig > 0)
+                {
+                    cls.allowedAttributes.Clear();
+                }
 
                 for (int i = 0; i < len; i++)
                 {
