@@ -339,7 +339,7 @@ namespace Python.Runtime
         public static int tp_setattro(BorrowedReference ob, BorrowedReference key, BorrowedReference val)
         {
             string? name = Runtime.GetManagedString(key);
-
+            
             var type = Runtime.PyObject_TYPE(ob);
             var cls = (ClassBase)GetManagedObject(type)!;
 
@@ -374,9 +374,21 @@ namespace Python.Runtime
                 }
             }
 
+            // VS 2026-03-24: Allow setting new attributes in class constructor (for inherited classes)
+
+            PyObject currentframe = Runtime.InspectModule.GetAttr("currentframe");
+            PyObject? functionName = currentframe.Invoke().GetAttr("f_code")?.GetAttr("co_name");
+
+            bool insideInit = false;
+
+            if (functionName != null)
+            {
+                insideInit = functionName.ToString() == "__init__";
+            }
+
             //if (!name.StartsWith("_"))  // allow private/magic names
             //{
-                if (!cls.allowedAttributes.Contains(name))
+            if (!(cls.allowedAttributes.Contains(name) || insideInit))
                 {
                     Exceptions.SetError(Exceptions.AttributeError, $"object has no attribute '{name}'");
                     return -1;
