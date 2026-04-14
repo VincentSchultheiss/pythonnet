@@ -330,7 +330,7 @@ namespace Python.Runtime
             }
         }
 
-        const int MaxCollectRetriesOnShutdown = 20;
+        const int MaxCollectRetriesOnShutdown = 3;  // 20
         internal static int _collected;
         static bool TryCollectingGarbage(int runs, bool forceBreakLoops,
                                          bool obj = true, bool derived = true, bool buffer = true)
