@@ -470,19 +470,25 @@ namespace Python.Runtime
                     }
                 }
 
-                if (bestCount > 1 && fewestDefaultsRequired > 0)
-                {
-                    // Best effort for determining method to match on gives multiple possible
-                    // matches and we need at least one default argument - bail from this point
-                    var stringBuilder = new StringBuilder("Not enough arguments provided to disambiguate the method.  Found:");
-                    foreach (var matchedMethod in argMatchedMethods)
-                    {
-                        stringBuilder.AppendLine();
-                        stringBuilder.Append(matchedMethod.Method.ToString());
-                    }
-                    Exceptions.SetError(Exceptions.TypeError, stringBuilder.ToString());
-                    return null;
-                }
+                // VS 2026-05-21: Even if fewestDefaultsRequired > 0, we decide that the first match
+                //                (with the fewest defaults required) should be accepted.
+
+                // TODO: When more methods match and the distinction is only depending on (the type of) one input argument,
+                //       determine the "level of separation" and choose the overload with the most direct type match.
+
+                //if (bestCount > 1 && fewestDefaultsRequired > 0)
+                //{
+                //    // Best effort for determining method to match on gives multiple possible
+                //    // matches and we need at least one default argument - bail from this point
+                //    var stringBuilder = new StringBuilder("Not enough arguments provided to disambiguate the method.  Found:");
+                //    foreach (var matchedMethod in argMatchedMethods)
+                //    {
+                //        stringBuilder.AppendLine();
+                //        stringBuilder.Append(matchedMethod.Method.ToString());
+                //    }
+                //    Exceptions.SetError(Exceptions.TypeError, stringBuilder.ToString());
+                //    return null;
+                //}
 
                 // If we're here either:
                 //      (a) There is only one best match
