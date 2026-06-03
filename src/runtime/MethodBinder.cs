@@ -247,7 +247,8 @@ namespace Python.Runtime
             // TODO: Clean up
             return tc switch
             {
-                TypeCode.Object => 1,
+                TypeCode.Object when t.Name != "Complex" => 1,
+                TypeCode.Object when t.Name == "Complex" => 22,  // make lower priority than double
                 TypeCode.UInt64 => 10,
                 TypeCode.UInt32 => 11,
                 TypeCode.UInt16 => 12,
