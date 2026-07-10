@@ -62,5 +62,6 @@
     <PackageReference Include="Lost.Compat.NullabilityAttributes" Version="0.0.4" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.*" PrivateAssets="All" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+	<PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="5.6.0" />
   </ItemGroup>
 </Project>
