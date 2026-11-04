@@ -26,10 +26,21 @@ namespace Python.Runtime
         void CacheAccessors()
         {
             PropertyInfo md = info.Value;
-            getter = md.GetGetMethod(true) ?? md.GetBaseGetMethod(true);
-            setter = md.GetSetMethod(true) ?? md.GetBaseSetMethod(true);
+            getter = FilterAccessor(md.GetGetMethod(true) ?? md.GetBaseGetMethod(true));
+            setter = FilterAccessor(md.GetSetMethod(true) ?? md.GetBaseSetMethod(true));
         }
 
+        /// <summary>
+        /// Filter out "private" and "internal" accessors ("protected" still passes).
+        /// </summary>
+        /// <param name="m"> Method info </param>
+        /// <returns> Method info </returns>
+        private static MethodInfo? FilterAccessor(MethodInfo? m)
+        {
+            if (m == null) return null;
+
+            return (m.IsPublic || m.IsFamily || m.IsFamilyOrAssembly) ? m : null;
+        }
 
         /// <summary>
         /// Descriptor __get__ implementation. This method returns the
