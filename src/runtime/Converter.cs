@@ -543,7 +543,7 @@ namespace Python.Runtime
         {
             TypeCode typeCode = Type.GetTypeCode(type);
             return type.IsEnum
-                   || typeCode is TypeCode.Object or TypeCode.Decimal or TypeCode.DateTime or TypeCode.Int32;
+                   || typeCode is TypeCode.Object or TypeCode.Decimal or TypeCode.DateTime or TypeCode.Int32 or TypeCode.Int64;
         }
 
         internal delegate bool TryConvertFromPythonDelegate(BorrowedReference pyObj, out object? result);
