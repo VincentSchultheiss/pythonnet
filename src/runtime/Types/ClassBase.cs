@@ -387,14 +387,14 @@ namespace Python.Runtime
                 insideInit = functionName.ToString() == "__init__";
             }
 
-            //if (!name.StartsWith("_"))  // allow private/magic names
-            //{
-            if (!(cls.allowedAttributes.Contains(name) || insideInit))
-                {
-                    Exceptions.SetError(Exceptions.AttributeError, $"object has no attribute '{name}'");
-                    return -1;
-                }
-            //}
+            if (!name.StartsWith("__"))  // allow adding dunder attributes (like "__dispatch_info__")
+            {
+                if (!(cls.allowedAttributes.Contains(name) || insideInit))
+                    {
+                        Exceptions.SetError(Exceptions.AttributeError, $"object has no attribute '{name}'");
+                        return -1;
+                    }
+            }
 
             return Runtime.PyObject_GenericSetAttr(ob, key, val);
         }
